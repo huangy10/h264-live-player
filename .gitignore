@@ -1,3 +1,6 @@
 node_modules
 public/_main.js
 
+*.pyc
+__pycache__
+.vscode
