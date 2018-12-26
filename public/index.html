@@ -4,10 +4,10 @@
   </head>
   <body>
 
-    <button type="button" onclick="wsavc.playStream()">Start Video</button>
+    <!-- <button type="button" onclick="wsavc.playStream()">Start Video</button>
     <button type="button" onclick="wsavc.stopStream()">Stop Video</button>
     <button type="button" onclick="wsavc.disconnect()">Disconnect</button>
-    <br/>
+    <br/> -->
 
   <!-- provide WSAvcPlayer -->
     <script type="text/javascript" src="http-live-player.js">;</script>
@@ -15,13 +15,17 @@
 
 var canvas = document.createElement("canvas");
 document.body.appendChild(canvas);
+const queryParamString = window.location.search.substring(1); // remove question mark
+if (queryParamString == "r") {
+  canvas.style.cssText = "transform: rotateX(180deg);"
+}
 
 // Create h264 player
 var uri = "ws://" + document.location.host;
 var wsavc = new WSAvcPlayer(canvas, "webgl", 1, 35);
-wsavc.connect(uri);
-
-
+wsavc.connect(uri, function () {
+  wsavc.playStream();
+});
 //expose instance for button callbacks
 window.wsavc = wsavc;
 

@@ -50,13 +50,13 @@ var WSAvcPlayer = new Class({
       else if (data[4] == 0x68) {
         naltype = "PPS";
       }
-    }
-    //log("Passed " + naltype + " to decoder");
+    } 
+    log("naltype: " + data[0])
     this.avc.decode(data);
   },
 
-  connect : function(url) {
-
+  connect : function(url, callback) {
+    var running = true;
     // Websocket initialization
     if (this.ws != undefined) {
       this.ws.close();
@@ -67,6 +67,8 @@ var WSAvcPlayer = new Class({
 
     this.ws.onopen = () => {
       log("Connected to " + url);
+      running = true;
+      callback();
     };
 
 
@@ -75,16 +77,12 @@ var WSAvcPlayer = new Class({
     this.ws.onmessage = (evt) => {
       if(typeof evt.data == "string")
         return this.cmd(JSON.parse(evt.data));
-
       this.pktnum++;
       var frame = new Uint8Array(evt.data);
       //log("[Pkt " + this.pktnum + " (" + evt.data.byteLength + " bytes)]");
       //this.decode(frame);
       framesList.push(frame);
     };
-
-
-    var running = true;
 
     var shiftFrame = function() {
       if(!running)
@@ -99,8 +97,9 @@ var WSAvcPlayer = new Class({
       var frame = framesList.shift();
 
 
-      if(frame)
+      if(frame) {
         this.decode(frame);
+      }
 
       requestAnimationFrame(shiftFrame);
     }.bind(this);
@@ -123,7 +122,11 @@ var WSAvcPlayer = new Class({
                         : YUVCanvas;
 
     var canvas = new canvasFactory(this.canvas, new Size(width, height));
-    this.avc.onPictureDecoded = canvas.decode;
+    log("init canvas: " + typeof(canvasFactory));
+    this.avc.onPictureDecoded = function (mx, w, h) {
+      log("decode!");
+      canvas.decode(mx, w, h);
+    };
     this.emit("canvasReady", width, height);
   },
 
