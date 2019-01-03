@@ -51,7 +51,6 @@ var WSAvcPlayer = new Class({
         naltype = "PPS";
       }
     } 
-    log("naltype: " + data[0])
     this.avc.decode(data);
   },
 
@@ -123,10 +122,7 @@ var WSAvcPlayer = new Class({
 
     var canvas = new canvasFactory(this.canvas, new Size(width, height));
     log("init canvas: " + typeof(canvasFactory));
-    this.avc.onPictureDecoded = function (mx, w, h) {
-      log("decode!");
-      canvas.decode(mx, w, h);
-    };
+    this.avc.onPictureDecoded = canvas.decode;
     this.emit("canvasReady", width, height);
   },
 
