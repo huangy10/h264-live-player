@@ -6,7 +6,7 @@ __author__ = "Woody Huang"
 __version__ = "1.0"
 
 env.hosts = [
-    "pi@192.168.199.50"
+    "pi@192.168.199.51"
 ]
 
 def install():

@@ -30,7 +30,14 @@ var WSAvcPlayer = new Class({
     //WebSocket variable
     this.ws;
     this.pktnum = 0;
+    this.canvasInited = false;
+    this.dbg_output = document.getElementById("dbg_msg");
+  },
 
+  dbg : function(msg) {
+    if(this.dbg_output) {
+      this.dbg_output.innerText = msg;
+    }
   },
 
 
@@ -74,9 +81,16 @@ var WSAvcPlayer = new Class({
     var framesList = [];
 
     this.ws.onmessage = (evt) => {
-      if(typeof evt.data == "string")
+      if(typeof evt.data == "string") {
+        this.dbg("receive canvas configuration");
+        this.canvasInited = true;
         return this.cmd(JSON.parse(evt.data));
+      }
+      if (!this.canvasInited) {
+        return;
+      }
       this.pktnum++;
+      this.dbg("receive frame: " + this.pktnum);
       var frame = new Uint8Array(evt.data);
       //log("[Pkt " + this.pktnum + " (" + evt.data.byteLength + " bytes)]");
       //this.decode(frame);
@@ -95,7 +109,7 @@ var WSAvcPlayer = new Class({
 
       var frame = framesList.shift();
 
-
+      // 以10%的概率丢掉frame
       if(frame) {
         this.decode(frame);
       }
